@@ -318,7 +318,15 @@ export class WavRecorder {
       }
       this.stream = await navigator.mediaDevices.getUserMedia(config);
     } catch (err) {
-      throw new Error('Could not start media stream');
+      let errorMessage = 'Could not start media stream';
+      if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+        errorMessage = 'Microphone access was denied. Please allow access to your microphone.';
+      } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+        errorMessage = 'No microphone found. Please connect a microphone.';
+      } else {
+        errorMessage += `: ${err.message}`;
+      }
+      throw new Error(errorMessage);
     }
 
     const context = new AudioContext({ sampleRate: this.sampleRate });

@@ -4,21 +4,21 @@ import './Button.scss';
 import { Icon } from 'react-feather';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  label?: string;
   icon?: Icon;
   iconPosition?: 'start' | 'end';
   iconColor?: 'red' | 'green' | 'grey';
   iconFill?: boolean;
   buttonStyle?: 'regular' | 'action' | 'alert' | 'flush';
+  children?: React.ReactNode;
 }
 
 export function Button({
-  label = 'Okay',
-  icon = void 0,
+  icon = undefined,
   iconPosition = 'start',
-  iconColor = void 0,
+  iconColor = undefined,
   iconFill = false,
   buttonStyle = 'regular',
+  children,
   ...rest
 }: ButtonProps) {
   const StartIcon = iconPosition === 'start' ? icon : null;
@@ -39,7 +39,7 @@ export function Button({
           <StartIcon />
         </span>
       )}
-      <span className="label">{label}</span>
+      {children && <span className="label">{children}</span>}
       {EndIcon && (
         <span className="icon icon-end">
           <EndIcon />

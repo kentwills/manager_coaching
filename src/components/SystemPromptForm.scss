@@ -1,0 +1,58 @@
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: #333;
+  padding-right: 1em;
+}
+
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 8px;
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+  color: #333;
+}
+
+.form-group textarea {
+  resize: vertical; /* Allow vertical resizing */
+}
+
+/* Add focus styles for better accessibility */
+.form-group textarea:focus,
+.form-group select:focus {
+  border-color: #66afe9;
+  outline: none;
+  box-shadow: 0 0 3px rgba(102, 175, 233, 0.6);
+}
+
+/* Hide elements with class 'prompt' on iPhone viewports */
+@media (max-width: 600px) {
+  .prompt {
+    display: none;
+  }
+}
+
+.system-prompt-form .connect-button {
+    margin-bottom: 16px;
+}
+
+/* You can adjust the margin for small screens */
+@media (max-width: 600px) {
+  .system-prompt-form .connect-button {
+    width: 98%; /* Slightly less margin on small screens if desired */
+  }
+}
+
+.system-prompt-form .advanced-button {
+  margin-bottom: 16px;
+}
