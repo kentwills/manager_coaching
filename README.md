@@ -2,27 +2,29 @@
 
 ## Building Communication Skills with Foundational Frameworks
 
-This tool serves as a platform for new managers and leaders to practice navigating difficult conversations by engaging in iterative, hands-on practice with feedback.
+Practice navigating difficult conversations through iterative, hands-on practice with feedback.
 
-### What is the Coaching Tool?
+### What is this tool?
 
-In my experience, most of the coaching I do is more focused on the people challenges rather than the technical ones. I think this is more common as early in careers there is more emphasis on technical ability and those with technical ability are launched into leadership roles without much preparation. Managers often use real scenarios to gain experience in how to communicate in tricky situations and hopefully they don't make career ending mistakes. I spend a lot of time working on a principle based approach to navigating these tough situations and recommend books to spin up, but this is only the start. It usually takes time for someone to actually be able to use some of these tactics effortlessly in communication. In some of my coaching where I have been invited to support coaching managers in other companies we are able to go through many rounds of practice getting these principles right. This tool offers a way for managers to quickly encounter and learn from varied scenarios by simulating them using AI.
+This tool, designed for managers and leaders with direct reports, uses OpenAI's real-time voice API to simulate conversations. You act as the "manager" while the AI plays the "engineer" at different difficulty levels, providing a realistic way to practice effective communication across various scenarios.
 
-Through simulated interactions, users practice giving feedback and getting feedback real-time with an AI agent. You can even modify the prompts to suit your needs more specifically.
+### How to use this tool?
+This tool is designed for quick, iterative conversations. Aim for a 5-minute session, then switch to evaluation mode to review your approach. Practicing in small increments will help you refine your communication skills in a focused manner. Also read up on [the SBI model](https://www.ccl.org/articles/leading-effectively-articles/closing-the-gap-between-intent-vs-impact-sbii/) and [Radical Candor](https://www.radicalcandor.com/) as those are the two feedback evaluation mechanisms.
+- [Test it out here.](https://kentwills.github.io/manager_coaching)
 
 ### Why Use This Tool?
 
-- **Engage in Realistic Scenarios**: Interact with an AI agent in scenarios modeled on real-world challenges, allowing users to build and refine their skills.
-- **Receive Immediate Feedback**: Constructive feedback is provided after each session to help users recognize and address areas for improvement.
-- **Utilize Proven Frameworks**: The tool leverages established coaching methods, allowing users to practice principles-based approaches in a way that builds muscle memory.
+- **Engage in Realistic Scenarios**: The scenario is adaptive and created from real-life scenarios allowing you to practice the same scenario with the same difficulty multiple times with varied communication.
+- **Receive Immediate Feedback**: Leveraging the evaluation mode gets you feedback in the moment so that you can focus on practicing that specific skill.
+- **Utilize Proven Frameworks**: The tool leverages established coaching methods, the SBI model and radical Candor, allowing users to practice principles-based approaches in a way that builds muscle memory.
 
 ### Who Can Benefit?
 
-New managers, leaders, and anyone aiming to strengthen their communication skills in tough situations will find this tool valuable.
+Anyone with direct reports or leaders who need to hold a high level of accountability through effective communication.
 
 ### Why AI?
 
-Practicing with AI offers a flexible and accessible alternative to in-person role-playing sessions. This tool allows new leaders to refine their skills efficiently and at a lower cost.
+Practicing with AI offers a flexible and accessible alternative to in-person role-playing sessions. This tool allows leaders to refine their skills efficiently and at a lower cost.
 
 ## Getting Started with the Tech for a Local Installation
 
