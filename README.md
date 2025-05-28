@@ -28,6 +28,7 @@ Practicing with AI offers a flexible and accessible alternative to in-person rol
 ### Installation
 
 This is a React project initiated with `create-react-app` and bundled using Webpack and is built on top of the [openai-realtime-console](https://github.com/openai/openai-realtime-console).
+The application now defaults to OpenAI's `gpt-4o` realtime model and uses the `tts-1-hd` speech model for the highest quality audio responses.
 
 1. **Install Dependencies**:
 
