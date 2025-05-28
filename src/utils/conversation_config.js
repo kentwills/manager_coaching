@@ -1,30 +1,61 @@
-/* -------- SCENARIO PROMPTS -------- */
 export const scenarioPrompts = {
   'Repeated Deadline Misses': {
-    managerPrompt: `You're leading a high-stakes project. One teammate has missed several deadlines, citing technical issues but not seeking help or flagging risks early. Delays are hurting morale and client confidence. Meet with them to learn why and agree on a recovery plan.`,
-    icPrompt: `Tight deadlines, shifting priorities, and unexpected technical problems have set you back. You’ve raised some issues but doubt your manager grasps the full scope. With more time you can deliver quality work, and you feel the current schedule is unrealistic.`,
+    managerPrompt: `
+Our consumer-facing “QuickBook” feature ships next sprint.  
+Alexa (frontend) has slipped three React PRs in a row—QA flagged blockers in Jira, but Alex only mentions “Webpack issues” and hasn’t asked for help in #frontend-support.  
+Delays are hurting morale and marketing is nervous.  
+Meet with Alexa to uncover the real blockers and agree on a recovery plan.`,
+    icPrompt: `
+You’re Alexa. TypeScript errors and flaky Storybook screenshots keep derailing you.  
+You’ve raised them in stand-ups, but feel Sam (your manager) underestimates the effort.  
+With an extra sprint you could land clean code, yet the current deadline feels impossible.`,
   },
 
   'Resistance to Feedback': {
-    managerPrompt: `A team member is ignoring established best practices. While results sometimes land, the inconsistencies threaten quality. Give feedback, realign on standards, and understand their thinking.`,
-    icPrompt: `You trust your own methods based on past success and haven’t heard concerns. You’re unaware that straying from standards could be a problem.`,
+    managerPrompt: `
+Jordan (backend) keeps writing raw SQL in the Node service instead of using our Prisma ORM.  
+Code reviews cite performance and security risks; Jordan brushes it off as “faster.”  
+Realign on standards, understand Jordan’s view, and prevent future drift.`,
+    icPrompt: `
+You’re Jordan. Raw SQL has served you well at past startups and you believe it’s quicker than Prisma.  
+No one complained directly until now, so you assumed it was fine.`,
   },
 
   'Negative Attitude in Meetings': {
-    managerPrompt: `One teammate’s critical tone in meetings dampens morale. Colleagues feel discouraged. You value candor but need to address the impact of their delivery.`,
-    icPrompt: `You voice honest concerns about direction, believing candor helps. You’ve noticed others disengage but see your input as valuable.`,
+    managerPrompt: `
+In two recent architecture reviews, Priya shot down ideas with comments like “that’ll never scale,” then sighed when decisions went another way.  
+Teammates now hesitate to speak up.  
+Address Priya’s tone without losing her useful technical critiques.`,
+    icPrompt: `
+You’re Priya. You’ve watched premature decisions sink projects and feel obliged to flag risks.  
+Your blunt style aims to save time, not hurt feelings, but you sense people tune out.`,
   },
 
   "Disrespecting Colleagues' Ideas": {
-    managerPrompt: `A teammate regularly dismisses peers’ ideas, causing tension and stifling discussion. Discuss more respectful collaboration.`,
-    icPrompt: `You’re passionate and direct. You’ve rejected suggestions you deem ineffective and believe bluntness keeps the project on course.`,
+    managerPrompt: `
+During yesterday’s sprint planning, Leo cut off Data Scientist Mei’s A/B-test suggestion with  
+“That’s a waste of time—we won’t learn anything new.”  
+Mei later said she felt brushed aside.  
+Talk with Leo about giving feedback constructively—especially to cross-functional partners—without shutting them down.`,
+    icPrompt: `
+You’re Leo, a senior ML engineer focused on shipping fast.  
+You thought Mei’s test would slow release and said so bluntly.  
+You value directness and didn’t realize it sounded disrespectful.`,
   },
 
   'Frequent Absences Affecting Work': {
-    managerPrompt: `A teammate’s repeated absences and lateness are hurting output and team flow. You lack context and their work is slipping. Understand the situation and craft a workable solution.`,
-    icPrompt: `Personal issues have forced you to miss work and fall behind. You prefer privacy and haven’t shared details, hoping for temporary flexibility.`,
+    managerPrompt: `
+Sara (DevOps) has been late or offline five mornings in two weeks.  
+Her Terraform tickets now block other teams.  
+She hasn’t filed PTO or shared context.  
+Understand her situation and find a plan that supports her and keeps deliverables moving.`,
+    icPrompt: `
+You’re Sara. A family health issue means early doctor runs.  
+You hoped to quietly make up hours, but backlog is piling up.  
+You’re uneasy sharing details and fear looking unreliable.`,
   },
 };
+
 
 /* -------- DIFFICULTY PROMPTS -------- */
 export const difficultyPrompts = {
