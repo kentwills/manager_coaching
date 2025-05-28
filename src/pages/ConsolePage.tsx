@@ -38,6 +38,7 @@ export function ConsolePage() {
     new RealtimeClient({
       apiKey: apiKey,
       dangerouslyAllowAPIKeyInBrowser: true,
+      baseUrl: 'https://api.openai.com/v1',
     })
   );
 
@@ -78,6 +79,7 @@ export function ConsolePage() {
     clientRef.current = new RealtimeClient({
       apiKey,
       dangerouslyAllowAPIKeyInBrowser: true,
+      baseUrl: 'https://api.openai.com/v1',
     });
 
     return () => {
