@@ -102,11 +102,14 @@ export function ConsolePage() {
       setItems([]);
       const client = clientRef.current;
 
-      client.updateSession({
-        turn_detection: { type: 'server_vad' },
-        input_audio_transcription: { model: 'whisper-1' },
-        instructions: systemPrompt,
-      });
+    client.updateSession({
+      model: 'gpt-4o',
+      turn_detection: { type: 'server_vad' },
+      input_audio_transcription: { model: 'whisper-1' },
+      // `output_audio` isn't yet in the library's types, so cast to `any`
+      output_audio: { model: 'tts-1-hd' },
+      instructions: systemPrompt,
+    } as any);
 
       const wavRecorder = wavRecorderRef.current;
       const wavStreamPlayer = wavStreamPlayerRef.current;
