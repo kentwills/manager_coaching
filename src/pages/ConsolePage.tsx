@@ -1,20 +1,15 @@
-import React, { useEffect, useRef, useCallback, useState } from 'react';
-import { X, Edit } from 'react-feather';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Edit } from 'react-feather';
 import { RealtimeClient } from '@openai/realtime-api-beta';
 import { ItemType } from '@openai/realtime-api-beta/dist/lib/client';
-import { WavRecorder, WavStreamPlayer } from '../lib/wavtools/index';
-import { WavRenderer } from '../utils/wav_renderer';
+import { WebRTCConnection } from '../utils/webrtc';
 
 import { Button } from '../components/button/Button';
 import ConversationBlock from './ConversationBlock';
 import SystemPromptForm from '../components/SystemPromptForm';
-import Visualization from '../components/Visualization';
 
 import './ConsolePage.scss';
 
-/**
- * Type for all event logs
- */
 interface RealtimeEvent {
   time: string;
   source: 'client' | 'server';
@@ -28,61 +23,41 @@ export function ConsolePage() {
     return storedKey || '';
   });
 
-  const wavRecorderRef = useRef<WavRecorder>(
-    new WavRecorder({ sampleRate: 24000 })
-  );
-  const wavStreamPlayerRef = useRef<WavStreamPlayer>(
-    new WavStreamPlayer({ sampleRate: 24000 })
-  );
   const clientRef = useRef<RealtimeClient>(
-    new RealtimeClient({
-      apiKey: apiKey,
-      dangerouslyAllowAPIKeyInBrowser: true,
-    })
+    new RealtimeClient({ apiKey, dangerouslyAllowAPIKeyInBrowser: true })
   );
-
-  const clientCanvasRef = useRef<HTMLCanvasElement>(null);
-  const serverCanvasRef = useRef<HTMLCanvasElement>(null);
+  const webrtcRef = useRef<WebRTCConnection | null>(null);
+  const localAudioRef = useRef<HTMLAudioElement>(null);
+  const remoteAudioRef = useRef<HTMLAudioElement>(null);
   const startTimeRef = useRef<string>(new Date().toISOString());
 
   const [items, setItems] = useState<ItemType[]>([]);
   const [realtimeEvents, setRealtimeEvents] = useState<RealtimeEvent[]>([]);
   const [isConnected, setIsConnected] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+
   const handleError = async (message: string) => {
     setErrorMessage(message);
     setIsConnected(false);
-
     const client = clientRef.current;
-    const wavRecorder = wavRecorderRef.current;
-    const wavStreamPlayer = wavStreamPlayerRef.current;
-
-    if (client) client.disconnect();
-    if (wavRecorder) await wavRecorder.end();
-    if (wavStreamPlayer) await wavStreamPlayer.interrupt();
+    client.disconnect();
+    webrtcRef.current?.close();
   };
 
   const resetAPIKey = useCallback(() => {
-    const apiKey = prompt('OpenAI API Key');
-    if (apiKey !== null) {
+    const key = prompt('OpenAI API Key');
+    if (key !== null) {
       localStorage.clear();
-      localStorage.setItem('tmp::voice_api_key', apiKey);
+      localStorage.setItem('tmp::voice_api_key', key);
       window.location.reload();
     }
   }, []);
 
-
   useEffect(() => {
-    wavRecorderRef.current = new WavRecorder({ sampleRate: 24000 });
-    wavStreamPlayerRef.current = new WavStreamPlayer({ sampleRate: 24000 });
     clientRef.current = new RealtimeClient({
       apiKey,
       dangerouslyAllowAPIKeyInBrowser: true,
     });
-
-    return () => {
-      // Clean up if necessary
-    };
   }, [apiKey]);
 
   useEffect(() => {
@@ -95,8 +70,8 @@ export function ConsolePage() {
     }
   }, [apiKey]);
 
-  const connectConversation = useCallback(async (systemPrompt:string) => {
-    try{
+  const connectConversation = useCallback(async (systemPrompt: string) => {
+    try {
       setErrorMessage('');
       setRealtimeEvents([]);
       setItems([]);
@@ -108,30 +83,29 @@ export function ConsolePage() {
         instructions: systemPrompt,
       });
 
-      const wavRecorder = wavRecorderRef.current;
-      const wavStreamPlayer = wavStreamPlayerRef.current;
-
       startTimeRef.current = new Date().toISOString();
       setIsConnected(true);
-      setRealtimeEvents([]);
       setItems(client.conversation.getItems());
 
-      await wavRecorder.begin();
-      await wavStreamPlayer.connect();
-      await client.connect();
-      await wavRecorder.record(async (data) =>{ 
-        try{
-          client.appendInputAudio(data.mono)
-        } catch(e){
-          console.error('Error sending audio data:', e);
-          // Optionally, stop the recorder if an error occurs
-
-          //await wavRecorder.end();
-          //setIsConnected(false);
-        }
+      webrtcRef.current = new WebRTCConnection({
+        client,
+        onRemoteStream: (stream) => {
+          if (remoteAudioRef.current) {
+            remoteAudioRef.current.srcObject = stream;
+            remoteAudioRef.current.play().catch(() => {});
+          }
+        },
       });
 
-    } catch(e){
+      const localStream = await webrtcRef.current.start();
+      if (localAudioRef.current) {
+        localAudioRef.current.srcObject = localStream;
+        localAudioRef.current.muted = true;
+        localAudioRef.current.play().catch(() => {});
+      }
+
+      await client.connect();
+    } catch (e) {
       setIsConnected(false);
       setErrorMessage((e as Error).message);
       console.error(e);
@@ -140,15 +114,9 @@ export function ConsolePage() {
 
   const disconnectConversation = useCallback(async () => {
     setIsConnected(false);
-
     const client = clientRef.current;
     client.disconnect();
-
-    const wavRecorder = wavRecorderRef.current;
-    await wavRecorder.end();
-
-    const wavStreamPlayer = wavStreamPlayerRef.current;
-    await wavStreamPlayer.interrupt();
+    webrtcRef.current?.close();
   }, []);
 
   const deleteConversationItem = useCallback(async (id: string) => {
@@ -156,78 +124,7 @@ export function ConsolePage() {
     client.deleteItem(id);
   }, []);
 
-  //Draws the visualization of the audio in realtime
   useEffect(() => {
-    let isLoaded = true;
-
-    const wavRecorder = wavRecorderRef.current;
-    const clientCanvas = clientCanvasRef.current;
-    let clientCtx: CanvasRenderingContext2D | null = null;
-
-    const wavStreamPlayer = wavStreamPlayerRef.current;
-    const serverCanvas = serverCanvasRef.current;
-    let serverCtx: CanvasRenderingContext2D | null = null;
-
-    const render = () => {
-      if (isLoaded) {
-        if (clientCanvas) {
-          if (!clientCanvas.width || !clientCanvas.height) {
-            clientCanvas.width = clientCanvas.offsetWidth;
-            clientCanvas.height = clientCanvas.offsetHeight;
-          }
-          clientCtx = clientCtx || clientCanvas.getContext('2d');
-          if (clientCtx) {
-            clientCtx.clearRect(0, 0, clientCanvas.width, clientCanvas.height);
-            const result = wavRecorder.recording
-              ? wavRecorder.getFrequencies('voice')
-              : { values: new Float32Array([0]) };
-            WavRenderer.drawBars(
-              clientCanvas,
-              clientCtx,
-              result.values,
-              '#0099ff',
-              10,
-              0,
-              8
-            );
-          }
-        }
-        if (serverCanvas) {
-          if (!serverCanvas.width || !serverCanvas.height) {
-            serverCanvas.width = serverCanvas.offsetWidth;
-            serverCanvas.height = serverCanvas.offsetHeight;
-          }
-          serverCtx = serverCtx || serverCanvas.getContext('2d');
-          if (serverCtx) {
-            serverCtx.clearRect(0, 0, serverCanvas.width, serverCanvas.height);
-            const result = wavStreamPlayer.analyser
-              ? wavStreamPlayer.getFrequencies('voice')
-              : { values: new Float32Array([0]) };
-            WavRenderer.drawBars(
-              serverCanvas,
-              serverCtx,
-              result.values,
-              '#009900',
-              10,
-              0,
-              8
-            );
-          }
-        }
-        window.requestAnimationFrame(render);
-      }
-    };
-    render();
-
-    return () => {
-      isLoaded = false;
-    };
-  }, []);
-
-  //realtime event handling 
-  useEffect(() => {
-    const wavStreamPlayer = wavStreamPlayerRef.current;
-    const wavRecorder = wavRecorderRef.current;
     const client = clientRef.current;
 
     client.on('realtime.event', async (realtimeEvent: RealtimeEvent) => {
@@ -239,15 +136,12 @@ export function ConsolePage() {
       }
       if (realtimeEvent.event.type === 'response.done') {
         const response = realtimeEvent.event.response;
-
-        if(response.status === 'failed'){
+        if (response.status === 'failed') {
           const error = response.status_details?.error;
-          if (error) {
-            if (error.type === 'insufficient_quota' ) {
-              await handleError(error.message);
-            }
-          }}
-
+          if (error && error.type === 'insufficient_quota') {
+            await handleError(error.message);
+          }
+        }
       }
       setRealtimeEvents((prevEvents) => {
         const lastEvent = prevEvents[prevEvents.length - 1];
@@ -265,27 +159,8 @@ export function ConsolePage() {
 
     client.on('error', (event: any) => console.error(event));
 
-    client.on('conversation.interrupted', async () => {
-      const trackSampleOffset = await wavStreamPlayer.interrupt();
-      if (trackSampleOffset?.trackId) {
-        const { trackId, offset } = trackSampleOffset;
-        await client.cancelResponse(trackId, offset);
-      }
-    });
-
-    client.on('conversation.updated', async ({ item, delta }: any) => {
+    client.on('conversation.updated', async ({ item }: any) => {
       const items = client.conversation.getItems();
-      if (delta?.audio) {
-        wavStreamPlayer.add16BitPCM(delta.audio, item.id);
-      }
-      if (item.status === 'completed' && item.formatted.audio?.length) {
-        const wavFile = await WavRecorder.decode(
-          item.formatted.audio,
-          24000,
-          24000
-        );
-        item.formatted.file = wavFile;
-      }
       setItems(items);
     });
 
@@ -298,12 +173,7 @@ export function ConsolePage() {
 
   return (
     <div data-component="ConsolePage">
-      {/* Display Error Message */}
-      {errorMessage && (
-        <div className="error-message">
-          {errorMessage}
-        </div>
-      )}
+      {errorMessage && <div className="error-message">{errorMessage}</div>}
       <div className="content-top">
         <div className="content-title">
           <span>AI Coaching</span>
@@ -322,10 +192,8 @@ export function ConsolePage() {
       <div className="content-main">
         <div className="content-logs">
           <div className="content-actions">
-            <Visualization
-              clientCanvasRef={clientCanvasRef}
-              serverCanvasRef={serverCanvasRef}
-            />
+            <audio ref={localAudioRef} hidden />
+            <audio ref={remoteAudioRef} />
             <div className="spacer" />
           </div>
           <div className="content-block conversation">
@@ -347,7 +215,6 @@ export function ConsolePage() {
           </div>
         </div>
       </div>
-      
     </div>
   );
 }
