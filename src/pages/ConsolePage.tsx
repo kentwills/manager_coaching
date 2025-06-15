@@ -103,7 +103,7 @@ export function ConsolePage() {
       const client = clientRef.current;
 
     client.updateSession({
-      model: 'gpt-4o',
+      model: 'gpt-4o-tts',
       turn_detection: { type: 'server_vad' },
       input_audio_transcription: { model: 'whisper-1' },
       // `output_audio` isn't yet in the library's types, so cast to `any`
